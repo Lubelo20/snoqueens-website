@@ -69,6 +69,15 @@ h3{font-size:clamp(1.25rem,1.7vw,1.45rem);font-weight:600}
 .top nav a:hover{color:var(--gold-deep)}
 .top nav a[aria-current=true]{border-bottom-color:var(--gold-deep)}
 
+.menu-btn{display:none;align-items:center;justify-content:center;width:46px;height:46px;margin-right:-8px;padding:0;border:0;border-radius:8px;background:none;color:var(--ink);cursor:pointer}
+.menu-btn span,.menu-btn span::before,.menu-btn span::after{display:block;width:22px;height:2px;background:currentColor;transition:transform .2s,background-color .2s}
+.menu-btn span{position:relative}
+.menu-btn span::before,.menu-btn span::after{content:"";position:absolute;left:0}
+.menu-btn span::before{top:-7px}.menu-btn span::after{top:7px}
+.menu-btn[aria-expanded=true] span{background:transparent}
+.menu-btn[aria-expanded=true] span::before{transform:translateY(7px) rotate(45deg)}
+.menu-btn[aria-expanded=true] span::after{transform:translateY(-7px) rotate(-45deg)}
+
 /* Hero */
 .hero{position:relative;display:flex;align-items:center;min-height:max(540px,calc(100vh - 73px));min-height:max(540px,calc(100svh - 73px));overflow:hidden;background:var(--blue);color:#fff;text-align:center}
 .hero picture,.hero picture img{position:absolute;inset:0;width:100%;height:100%}
@@ -184,6 +193,25 @@ footer h2{margin-bottom:14px;color:var(--gold);font:600 .76rem var(--display);le
 }
 @media (max-width:430px){.top nav a{font-size:.68rem;letter-spacing:.02em;padding-inline:4px}}
 @media (max-width:359px){.top nav .opt{display:none}}
+@media (max-width:760px){
+  .js .brand span{position:static;width:auto;height:auto;overflow:visible;clip-path:none}
+  .js .menu-btn{display:inline-flex}
+  .js .top nav{position:absolute;top:100%;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 18px 30px rgba(20,25,29,.12);visibility:hidden;opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .2s,visibility 0s .2s}
+  .js .top.open nav{visibility:visible;opacity:1;transform:none;transition:opacity .2s,transform .2s}
+  .js .top nav ul{flex-direction:column;align-items:stretch;gap:0;padding:6px var(--gutter) 22px}
+  .js .top nav .opt{display:block}
+  .js .top nav a{padding:15px 2px;font-size:.95rem;letter-spacing:.06em;border-bottom:1px solid var(--line)}
+  .js .top nav a[aria-current=true]{color:var(--gold-deep)}
+  .js .top nav a.go{margin-top:18px;padding:15px;border:0;border-radius:999px;background:var(--gold);color:var(--ink);text-align:center}
+  .hero{align-items:flex-end}
+  .hero-copy{padding-block:40px 52px}
+  .hero h1{font-size:clamp(2.3rem,10vw,3rem);font-weight:400;line-height:1.08}
+  .band{padding-block:32px}
+  .panel img,.panel:nth-child(even) img{aspect-ratio:3/2}
+  .foot-main ul{gap:0}
+  .foot-main li a{padding-block:9px}
+  .foot-up{padding-block:10px}
+}
 @keyframes up{from{opacity:0;transform:translateY(14px)}}
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
@@ -193,6 +221,7 @@ footer h2{margin-bottom:14px;color:var(--gold);font:600 .76rem var(--display);le
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script>document.documentElement.className+=' js'</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -200,7 +229,8 @@ footer h2{margin-bottom:14px;color:var(--gold);font:600 .76rem var(--display);le
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#main"><img src="assets/logo-96.webp" width="44" height="44" alt=""><span>Sno Queens</span></a>
-    <nav aria-label="Main">
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><span></span></button>
+    <nav id="site-nav" aria-label="Main">
       <ul>
         <li><a href="#about">About</a></li>
         <li><a href="#solutions">Solutions</a></li>
@@ -438,6 +468,17 @@ footer h2{margin-bottom:14px;color:var(--gold);font:600 .76rem var(--display);le
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
   Object.keys(links).forEach(function (id) { seen.observe(document.getElementById(id)); });
+})();
+</script>
+<script>
+(function () {
+  var top = document.querySelector('.top'), btn = top.querySelector('.menu-btn'), mq = window.matchMedia('(max-width:760px)');
+  function set(open) { top.classList.toggle('open', open); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+  btn.addEventListener('click', function () { set(btn.getAttribute('aria-expanded') !== 'true'); });
+  top.querySelectorAll('nav a').forEach(function (a) { a.addEventListener('click', function () { set(false); }); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && top.classList.contains('open')) { set(false); btn.focus(); } });
+  document.addEventListener('click', function (e) { if (!top.contains(e.target)) set(false); });
+  if (mq.addEventListener) mq.addEventListener('change', function () { set(false); }); else mq.addListener(function () { set(false); });
 })();
 </script>
 </body>
